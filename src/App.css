@@ -1,0 +1,10 @@
+.msg{
+    display: flex;
+    gap: 10px
+}
+.msg img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
