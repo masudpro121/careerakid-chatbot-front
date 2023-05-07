@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { msgs, specailPrompt } from "./config";
-import { createCompletion } from "./api/my-openai";
+import { createChatCompletion, createCompletion } from "./api/my-openai";
 import UserImg from "./img/user.png";
 import BotImg from "./img/bot.jpg";
 import {  BsFillFileArrowDownFill } from "react-icons/bs";
@@ -11,15 +11,16 @@ function App() {
   const [trainedMsg, setTrainedMsg] = useState(msgs);
   const [inp, setInp] = useState("");
   const [saved, setSaved] = useState({});
-  console.log(trainedMsg);
-
+  const [name, setName] = useState('Alex');
+  const [age, setAge] = useState(18);
+  const [gender, setGender] = useState('male');
   const handleMessage = () => {
     const qs = inp.includes("Q:") && inp.includes("A:");
     if (!qs) {
       const currentMsg = { role: "user", content: specailPrompt +inp };
       setMessages([...messages, currentMsg]);
       setInp("");
-      createCompletion([...trainedMsg, currentMsg])
+      createChatCompletion([...trainedMsg, currentMsg])
         .then((res) => {
           setMessages([...messages, currentMsg, res.data.choices[0].message]);
         })
@@ -48,6 +49,34 @@ function App() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleForm = () => {
+    
+    let content = '';
+    if(gender=='male'){
+      content += 'Hello Mr.'+name+', '
+    }else if(gender=='female'){
+      content += 'Hello Mrs.'+name+', '
+    }else{
+      content += 'Hello '+name+', '
+    }
+    content+= 'How are you? '
+    if(age>=18){
+      createCompletion('Ask a random question for a Person who is greater than 18 years old?')
+      .then(res=>{
+        content += res.data.choices[0].text
+        setMessages([ { role: "assistant", content:content  }])
+      })
+    }else{
+      createCompletion('Ask a random question for a Child who is less than 18 years old?')
+      .then(res=>{
+        content += res.data.choices[0].text
+        setMessages([{ role: "assistant", content:content  }])
+      })
+    }
+    
+  }
+  console.log(messages);
   return (
     <div className="app">
       <div className="scroll-bottom" onClick={scrollToBottom}>
@@ -56,6 +85,16 @@ function App() {
       <div className="content" ref={contentRef}>
         <div className="header">
           <p>AI Chatbot</p>
+        </div>
+        <div className="myform">
+          <input onChange={(e)=>setName(e.target.value)} type="text" placeholder="type your name" />
+          <input onChange={(e)=>setAge(e.target.value)} type="number" placeholder="Age" />
+          <select onChange={(e)=>setGender(e.target.value)} name="gender" id="">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+          <button onClick={handleForm}>submit</button>
         </div>
         <div className="messages">
           {messages.map((msg, id) => {

@@ -11,10 +11,17 @@ const openai = new OpenAIApi(configuration)
 
 
 
-export function createCompletion(messages) {
+export function createChatCompletion(messages) {
     return openai.createChatCompletion({
       messages,
       model: "gpt-3.5-turbo",
+    })
+}
+
+export function createCompletion(msg) {
+    return openai.createCompletion({
+      prompt:msg,
+      model: "text-davinci-003",
     })
 }
 
